@@ -1,0 +1,31 @@
+{
+  "model": "MobileNetV3-Small transfer learning baseline",
+  "seed": 42,
+  "epochs": 5,
+  "class_to_idx": {
+    "fractured": 0,
+    "non_fractured": 1
+  },
+  "class_weights": [
+    1.7483766078948975,
+    0.7002601027488708
+  ],
+  "test": {
+    "loss": 0.5343968580598416,
+    "accuracy": 0.7608695652173914,
+    "precision": 0.7658536585365854,
+    "recall": 0.9573170731707317,
+    "specificity": 0.2727272727272727,
+    "f1": 0.8509485094850949,
+    "confusion_matrix": [
+      [
+        18,
+        48
+      ],
+      [
+        7,
+        157
+      ]
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "positive_class": "fractured",
+  "class_to_idx": {
+    "fractured": 0,
+    "non_fractured": 1
+  },
+  "accuracy": 0.7608695652173914,
+  "fracture_precision": 0.72,
+  "fracture_recall_sensitivity": 0.2727272727272727,
+  "non_fracture_specificity": 0.9573170731707317,
+  "fracture_f1": 0.3956043956043956,
+  "confusion_matrix_rows_actual_columns_predicted": [
+    [
+      18,
+      48
+    ],
+    [
+      7,
+      157
+    ]
+  ],
+  "true_fractured": 18,
+  "missed_fractured": 48,
+  "false_fracture_alarms": 7,
+  "true_non_fractured": 157
+}
