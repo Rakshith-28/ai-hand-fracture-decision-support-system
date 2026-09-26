@@ -1,6 +1,6 @@
 # AI-Based Decision Support System for Hand Fractures
 
-This repository contains the cleaned hand/wrist X-ray dataset, final MobileNetV3-Large training pipeline, trained checkpoint, evaluation metrics, graphs, and final progress presentation.
+This repository contains the cleaned hand/wrist X-ray dataset, final MobileNetV3-Large training pipeline, trained checkpoint, evaluation metrics, and graphs.
 
 ## Final dataset
 
@@ -39,9 +39,7 @@ Training is CPU-compatible but will run faster with suitable accelerated PyTorch
 
 - `train_advanced.py` — final training and evaluation pipeline
 - `model_output_advanced/` — best model, history, and test metrics
-- `graph_outputs/` — accuracy, loss, confusion-matrix, and comparison graphs
-- `presentation_output/Hand_Fracture_Advanced_Model_With_Graphs_Final.pptx` — final presentation
-- `EXPANDED_DATA_EXPERIMENT_REPORT.md` — record of additional-data experiments
+- `graph_outputs/` — accuracy, loss, and confusion-matrix graphs
 
 ## Important limitation
 

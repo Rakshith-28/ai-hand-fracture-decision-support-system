@@ -8,7 +8,6 @@ import numpy as np
 
 PROJECT = Path(__file__).resolve().parent
 ADVANCED = PROJECT / "model_output_advanced"
-BALANCED = PROJECT / "reference_results"
 OUTPUT = PROJECT / "graph_outputs"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -30,7 +29,6 @@ train_loss = [float(row["train_loss"]) for row in history]
 validation_loss = [float(row["validation_loss"]) for row in history]
 
 advanced = read_json(ADVANCED / "test_metrics.json")
-balanced = read_json(BALANCED / "test_metrics.json")
 
 plt.style.use("seaborn-v0_8-whitegrid")
 
@@ -83,34 +81,6 @@ for row in range(2):
 fig.colorbar(image, ax=axis)
 finish("confusion_matrix.png")
 
-
-# 4. Model comparison graph
-metric_names = ["Accuracy", "Precision", "Recall", "Specificity", "F1-score"]
-metric_keys = [
-    "accuracy",
-    "fracture_precision",
-    "fracture_recall",
-    "specificity",
-    "fracture_f1",
-]
-balanced_values = [balanced["test"][key] * 100 for key in metric_keys]
-advanced_values = [advanced["test"][key] * 100 for key in metric_keys]
-
-x = np.arange(len(metric_names))
-width = 0.36
-fig, axis = plt.subplots(figsize=(10, 5.8))
-old_bars = axis.bar(x - width / 2, balanced_values, width,
-                    label="MobileNetV3-Small", color="#7CA6D8")
-new_bars = axis.bar(x + width / 2, advanced_values, width,
-                    label="MobileNetV3-Large", color="#1F5FA7")
-axis.set_ylabel("Score (%)")
-axis.set_title("Recorded Test Metric Comparison")
-axis.set_xticks(x, metric_names)
-axis.set_ylim(0, 100)
-axis.legend()
-axis.bar_label(old_bars, fmt="%.1f", padding=3, fontsize=9)
-axis.bar_label(new_bars, fmt="%.1f", padding=3, fontsize=9)
-finish("model_comparison.png")
 
 print(f"Graphs saved in: {OUTPUT}")
 for file in sorted(OUTPUT.glob("*.png")):
