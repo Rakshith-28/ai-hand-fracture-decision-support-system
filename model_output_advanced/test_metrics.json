@@ -1,0 +1,25 @@
+{
+  "model": "Advanced MobileNetV3-Large",
+  "seed": 42,
+  "maximum_epochs": 15,
+  "completed_epochs": 15,
+  "best_epoch": 15,
+  "test": {
+    "loss": 0.48484037241597816,
+    "accuracy": 0.8779527559055118,
+    "fracture_precision": 0.8709677419354839,
+    "fracture_recall": 0.7012987012987013,
+    "specificity": 0.9548022598870056,
+    "fracture_f1": 0.7769784172661871,
+    "matrix": [
+      [
+        54,
+        23
+      ],
+      [
+        8,
+        169
+      ]
+    ]
+  }
+}

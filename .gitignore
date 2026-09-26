@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+FracAtlas/
+hand_dataset_images/
+additional_images/
+hand_dataset_prepared_expanded/
+hand_dataset_prepared_wrist_expanded/
+model_output_expanded/
+model_output_wrist_expanded/
+model_output_ensemble/
+tmp/
+*.inspect.ndjson
