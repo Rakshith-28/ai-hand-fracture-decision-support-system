@@ -1,0 +1,39 @@
+{
+  "selection_rule": "maximum validation accuracy with fracture recall >= 0.72",
+  "image_size": 224,
+  "fracture_threshold": 0.3250000000000001,
+  "validation": {
+    "accuracy": 0.8582677165354331,
+    "fracture_precision": 0.7733333333333333,
+    "fracture_recall": 0.7532467532467533,
+    "specificity": 0.903954802259887,
+    "fracture_f1": 0.763157894736842,
+    "matrix": [
+      [
+        58,
+        19
+      ],
+      [
+        17,
+        160
+      ]
+    ]
+  },
+  "test": {
+    "accuracy": 0.8622047244094488,
+    "fracture_precision": 0.8,
+    "fracture_recall": 0.7272727272727273,
+    "specificity": 0.9209039548022598,
+    "fracture_f1": 0.761904761904762,
+    "matrix": [
+      [
+        56,
+        21
+      ],
+      [
+        14,
+        163
+      ]
+    ]
+  }
+}

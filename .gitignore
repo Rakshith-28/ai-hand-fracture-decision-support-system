@@ -11,3 +11,10 @@ model_output_wrist_expanded/
 model_output_ensemble/
 tmp/
 *.inspect.ndjson
+unseen_predictions.csv
+model_output_resnet18_candidate/
+model_output_densenet121_candidate/
+model_output_advanced/baseline_87_80_model.pt
+model_output_advanced/baseline_87_80_metrics.json
+model_output_advanced/accuracy_threshold.json
+model_output_advanced/ensemble_evaluation.json

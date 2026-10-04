@@ -17,6 +17,9 @@ SEED = 42
 BATCH_SIZE = 24
 MAX_EPOCHS = 15
 PATIENCE = 5
+FRACTURE_SAMPLING_TARGET = 0.50
+ORIGINAL_SOURCE_SHARE = 0.90
+ADDED_SOURCE_PREFIX = "bonefract_"
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -43,7 +46,28 @@ train_data = datasets.ImageFolder(DATA / "train", transform=train_transform)
 validation_data = datasets.ImageFolder(DATA / "validation", transform=eval_transform)
 test_data = datasets.ImageFolder(DATA / "test", transform=eval_transform)
 counts = np.bincount(train_data.targets, minlength=2)
-weights = [1.0 / counts[target] for target in train_data.targets]
+fractured_index = train_data.class_to_idx["fractured"]
+normal_index = train_data.class_to_idx["non_fractured"]
+group_counts = {
+    (class_index, is_added): sum(
+        target == class_index
+        and Path(path).name.startswith(ADDED_SOURCE_PREFIX) == is_added
+        for path, target in train_data.samples
+    )
+    for class_index in (fractured_index, normal_index)
+    for is_added in (False, True)
+}
+weights = []
+for path, target in train_data.samples:
+    class_share = (
+        FRACTURE_SAMPLING_TARGET
+        if target == fractured_index
+        else 1.0 - FRACTURE_SAMPLING_TARGET
+    )
+    is_added = Path(path).name.startswith(ADDED_SOURCE_PREFIX)
+    source_share = 1.0 - ORIGINAL_SOURCE_SHARE if is_added else ORIGINAL_SOURCE_SHARE
+    weight = class_share * source_share / group_counts[(target, is_added)]
+    weights.append(weight)
 sampler = WeightedRandomSampler(
     weights, len(weights), replacement=True,
     generator=torch.Generator().manual_seed(SEED),
@@ -54,18 +78,25 @@ loaders = {
     "test": DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=False, num_workers=0),
 }
 
-model = models.mobilenet_v3_large(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
+checkpoint_path = OUTPUT / "best_advanced_model.pt"
+initial_checkpoint_used = checkpoint_path.is_file()
+model = models.mobilenet_v3_large(
+    weights=None if initial_checkpoint_used else models.MobileNet_V3_Large_Weights.DEFAULT
+)
 for parameter in model.features.parameters():
     parameter.requires_grad = False
-for block in model.features[-6:]:
+for block in model.features[-3:]:
     for parameter in block.parameters():
         parameter.requires_grad = True
 model.classifier[3] = nn.Linear(model.classifier[3].in_features, 2)
+if initial_checkpoint_used:
+    initial_checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    model.load_state_dict(initial_checkpoint["model_state"])
 
 criterion = nn.CrossEntropyLoss(label_smoothing=0.05)
 optimizer = torch.optim.AdamW(
     [parameter for parameter in model.parameters() if parameter.requires_grad],
-    lr=0.00015,
+    lr=0.00001 if initial_checkpoint_used else 0.00015,
     weight_decay=0.0002,
 )
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -107,7 +138,12 @@ def evaluate(loader):
 
 
 history = []
-best_f1 = -1.0
+if initial_checkpoint_used:
+    initial_validation = evaluate(loaders["validation"])
+    best_f1 = initial_validation["fracture_f1"]
+    print("INITIAL_VALIDATION", json.dumps(initial_validation), flush=True)
+else:
+    best_f1 = -1.0
 best_epoch = 0
 epochs_without_improvement = 0
 for epoch in range(1, MAX_EPOCHS + 1):
@@ -153,6 +189,8 @@ for epoch in range(1, MAX_EPOCHS + 1):
             "architecture": "mobilenet_v3_large",
             "image_size": 224,
             "balanced_sampling": True,
+            "fracture_sampling_target": FRACTURE_SAMPLING_TARGET,
+            "original_source_share": ORIGINAL_SOURCE_SHARE,
             "best_epoch": best_epoch,
         }, OUTPUT / "best_advanced_model.pt")
     else:
@@ -176,6 +214,9 @@ with (OUTPUT / "test_metrics.json").open("w", encoding="utf-8") as stream:
         "maximum_epochs": MAX_EPOCHS,
         "completed_epochs": len(history),
         "best_epoch": best_epoch,
+        "fracture_sampling_target": FRACTURE_SAMPLING_TARGET,
+        "original_source_share": ORIGINAL_SOURCE_SHARE,
+        "initial_checkpoint_used": initial_checkpoint_used,
         "test": test,
     }, stream, indent=2)
 print("TEST", json.dumps(test), flush=True)
