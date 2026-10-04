@@ -3,9 +3,9 @@ setlocal
 cd /d "%~dp0"
 
 if exist ".venv\Scripts\python.exe" (
-    ".venv\Scripts\python.exe" generate_graphs.py
+    ".venv\Scripts\python.exe" generate_graphs.py %*
 ) else if exist ".venv\bin\python.exe" (
-    ".venv\bin\python.exe" generate_graphs.py
+    ".venv\bin\python.exe" generate_graphs.py %*
 ) else (
     echo Project environment not found. Run setup.bat first.
     pause
@@ -13,5 +13,5 @@ if exist ".venv\Scripts\python.exe" (
 )
 
 echo.
-echo Graph generation finished. Check the graph_outputs folder.
+echo Graph generation finished. Check the matching graph_outputs folder.
 pause

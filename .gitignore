@@ -18,3 +18,6 @@ model_output_advanced/baseline_87_80_model.pt
 model_output_advanced/baseline_87_80_metrics.json
 model_output_advanced/accuracy_threshold.json
 model_output_advanced/ensemble_evaluation.json
+single_source_pipeline.log
+single_source_pipeline_status.txt
+/bonefract_single_source/

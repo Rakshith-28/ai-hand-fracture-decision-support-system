@@ -1,0 +1,23 @@
+{
+  "model": "Single-source anatomy-aware MobileNetV3-Large",
+  "seed": 2026,
+  "best_epoch": 4,
+  "test": {
+    "accuracy": 0.7790476190476191,
+    "fracture_precision": 0.8049792531120332,
+    "fracture_recall": 0.7376425855513308,
+    "specificity": 0.8206106870229007,
+    "fracture_f1": 0.7698412698412698,
+    "anatomy_accuracy": 0.8666666666666667,
+    "matrix": [
+      [
+        194,
+        69
+      ],
+      [
+        47,
+        215
+      ]
+    ]
+  }
+}

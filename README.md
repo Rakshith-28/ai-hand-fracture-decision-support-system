@@ -26,12 +26,39 @@ The prepared images are stored under `hand_dataset_prepared/`.
 
 The best checkpoint and its recorded results are in `model_output_advanced/`.
 
+## Single-source anatomy-aware experiment
+
+To remove cross-dataset style differences, a second MobileNetV3-Large model was
+trained only on BoneFract hand and wrist X-rays. Its shared backbone learns both
+fracture classification and hand-versus-wrist anatomy.
+
+- Unique images after duplicate removal: **5,378**
+- Training images: **4,314**
+- Validation images: **539**
+- Test images: **525**
+- Best epoch: **4**
+- Test accuracy: **77.90%**
+- Fracture recall: **73.76%**
+- Fracture F1-score: **76.98%**
+- Anatomy accuracy: **86.67%**
+
+This experiment improved fracture recall over the accuracy-focused model but did
+not replace it because its overall test accuracy was lower. Its checkpoint and
+metrics are stored in `model_output_single_source/`.
+
 ## Run the project
 
 1. Install Python 3.11 or newer.
 2. Double-click `setup.bat` once.
 3. Double-click `train_advanced.bat` to retrain the model.
 4. Double-click `generate_graphs.bat` to regenerate the result graphs.
+
+To build the single-source dataset and retrain its anatomy-aware model, run
+`train_single_source.bat`. Generate its separate graphs with:
+
+```powershell
+.\generate_graphs.bat single_source
+```
 
 ## Predict one X-ray
 

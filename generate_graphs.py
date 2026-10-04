@@ -1,3 +1,4 @@
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -7,8 +8,16 @@ import numpy as np
 
 
 PROJECT = Path(__file__).resolve().parent
-ADVANCED = PROJECT / "model_output_advanced"
-OUTPUT = PROJECT / "graph_outputs"
+parser = argparse.ArgumentParser(description="Generate model result graphs")
+parser.add_argument(
+    "model",
+    nargs="?",
+    choices=("advanced", "single_source"),
+    default="advanced",
+)
+args = parser.parse_args()
+MODEL_DIR = PROJECT / ("model_output_single_source" if args.model == "single_source" else "model_output_advanced")
+OUTPUT = PROJECT / ("graph_outputs_single_source" if args.model == "single_source" else "graph_outputs_advanced")
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 
@@ -17,7 +26,7 @@ def read_json(path):
         return json.load(stream)
 
 
-with (ADVANCED / "training_history.csv").open(
+with (MODEL_DIR / "training_history.csv").open(
     "r", newline="", encoding="utf-8-sig"
 ) as stream:
     history = list(csv.DictReader(stream))
@@ -26,9 +35,10 @@ epochs = [int(row["epoch"]) for row in history]
 train_accuracy = [float(row["train_accuracy"]) * 100 for row in history]
 validation_accuracy = [float(row["validation_accuracy"]) * 100 for row in history]
 train_loss = [float(row["train_loss"]) for row in history]
-validation_loss = [float(row["validation_loss"]) for row in history]
+has_validation_loss = "validation_loss" in history[0]
+validation_loss = [float(row["validation_loss"]) for row in history] if has_validation_loss else None
 
-advanced = read_json(ADVANCED / "test_metrics.json")
+metrics = read_json(MODEL_DIR / "test_metrics.json")
 
 plt.style.use("seaborn-v0_8-whitegrid")
 
@@ -54,21 +64,30 @@ finish("accuracy_graph.png")
 
 # 2. Error/loss graph
 plt.figure(figsize=(9, 5.5))
-plt.plot(epochs, train_loss, marker="o", linewidth=2, label="Training loss")
-plt.plot(epochs, validation_loss, marker="o", linewidth=2, label="Validation loss")
+if has_validation_loss:
+    plt.plot(epochs, train_loss, marker="o", linewidth=2, label="Training loss")
+    plt.plot(epochs, validation_loss, marker="o", linewidth=2, label="Validation loss")
+    plt.ylabel("Cross-entropy loss")
+    plt.title("Training and Validation Error (Loss)")
+else:
+    train_error = [100 - value for value in train_accuracy]
+    validation_error = [100 - value for value in validation_accuracy]
+    plt.plot(epochs, train_error, marker="o", linewidth=2, label="Training error")
+    plt.plot(epochs, validation_error, marker="o", linewidth=2, label="Validation error")
+    plt.ylabel("Classification error (%)")
+    plt.title("Training and Validation Classification Error")
 plt.xlabel("Epoch")
-plt.ylabel("Cross-entropy loss")
-plt.title("Training and Validation Error (Loss)")
 plt.xticks(epochs)
 plt.legend()
 finish("error_loss_graph.png")
 
 
 # 3. Confusion matrix
-matrix = np.array(advanced["test"]["matrix"])
+matrix = np.array(metrics["test"]["matrix"])
 fig, axis = plt.subplots(figsize=(7, 6))
 image = axis.imshow(matrix, cmap="Blues")
-axis.set_title("Advanced Model Confusion Matrix")
+model_title = "Single-Source Anatomy-Aware Model" if args.model == "single_source" else "Advanced MobileNetV3 Model"
+axis.set_title(f"{model_title} Confusion Matrix")
 axis.set_xlabel("Predicted class")
 axis.set_ylabel("Actual class")
 axis.set_xticks([0, 1], ["Fractured", "Non-fractured"])

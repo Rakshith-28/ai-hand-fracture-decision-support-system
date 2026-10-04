@@ -13,3 +13,12 @@
 - Limitation: the public metadata does not include patient ages, so this subset cannot be certified as adult-only
 
 The supplied validation and test sets were not modified, so the existing held-out evaluation remains comparable. Positive and negative manifests are stored in `dataset_metadata/bonefract_added_manifest.csv` and `dataset_metadata/bonefract_negative_manifest.csv`.
+
+## BoneFract single-source experiment
+
+The separate `bonefract_single_source/` dataset preserves BoneFract's supplied
+train, validation, and test divisions. Within every division and anatomy, an
+equal number of positive and negative candidates was selected. Content-level
+duplicates were removed, leaving 5,378 unique images. The complete provenance,
+patient identifiers, source paths, and SHA-256 hashes are recorded in
+`dataset_metadata/bonefract_single_source_manifest.csv`.
