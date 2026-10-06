@@ -4,12 +4,12 @@ This project classifies hand and wrist X-rays as `fractured` or `non_fractured` 
 
 ## Final dataset
 
-- Total: 1,690 X-rays
-- Training: 356 fractured and 826 non-fractured
-- Validation: 77 fractured and 177 non-fractured
-- Test: 77 fractured and 177 non-fractured
+- Active balanced dataset: 2,360 unique X-rays
+- Training: 826 fractured and 826 non-fractured
+- Validation: 177 fractured and 177 non-fractured
+- Test: 177 fractured and 177 non-fractured
 
-The images are stored in `hand_dataset/`. During training, weighted sampling presents both classes equally often without duplicating the saved image files. Validation and test data remain unchanged so evaluation reflects the real held-out distribution.
+The images are stored in `hand_dataset/`. Every split is physically class-balanced, no augmented copies are stored or generated during training, and SHA-256 verification prevents identical images from appearing in multiple splits. Replaced duplicate files are preserved locally in `excluded_evaluation_images/` and are not used by training, validation, or testing.
 
 ## Final result
 

@@ -4,6 +4,10 @@ __pycache__/
 FracAtlas/
 hand_dataset_images/
 additional_images/
+raw_data/
+excluded_evaluation_images/
+hand_dataset/**/Hand_patient*_001.png
+hand_dataset/**/wrist_patient*_001.png
 tmp/
 *.inspect.ndjson
 unseen_predictions.csv

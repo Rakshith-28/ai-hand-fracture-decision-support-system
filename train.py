@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch import nn
-from torch.utils.data import DataLoader, WeightedRandomSampler
+from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 
 
@@ -17,7 +17,6 @@ SEED = 42
 BATCH_SIZE = 24
 MAX_EPOCHS = 15
 PATIENCE = 5
-FRACTURE_SAMPLING_TARGET = 0.50
 
 random.seed(SEED)
 np.random.seed(SEED)
@@ -26,11 +25,6 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 
 train_transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=3),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(8),
-    transforms.RandomAffine(degrees=0, translate=(0.03, 0.03), scale=(0.95, 1.05)),
-    transforms.RandomAutocontrast(p=0.25),
-    transforms.ColorJitter(brightness=0.12, contrast=0.12),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
@@ -43,16 +37,25 @@ eval_transform = transforms.Compose([
 train_data = datasets.ImageFolder(DATA / "train", transform=train_transform)
 validation_data = datasets.ImageFolder(DATA / "validation", transform=eval_transform)
 test_data = datasets.ImageFolder(DATA / "test", transform=eval_transform)
-counts = np.bincount(train_data.targets, minlength=2)
-fractured_index = train_data.class_to_idx["fractured"]
-normal_index = train_data.class_to_idx["non_fractured"]
-weights = [1.0 / counts[target] for target in train_data.targets]
-sampler = WeightedRandomSampler(
-    weights, len(weights), replacement=True,
-    generator=torch.Generator().manual_seed(SEED),
-)
+
+for split_name, split_data in {
+    "training": train_data,
+    "validation": validation_data,
+    "test": test_data,
+}.items():
+    counts = np.bincount(split_data.targets, minlength=2)
+    fractured_index = split_data.class_to_idx["fractured"]
+    normal_index = split_data.class_to_idx["non_fractured"]
+    if counts[fractured_index] != counts[normal_index]:
+        raise ValueError(f"{split_name.title()} classes are not physically balanced: {counts.tolist()}")
 loaders = {
-    "train": DataLoader(train_data, batch_size=BATCH_SIZE, sampler=sampler, num_workers=0),
+    "train": DataLoader(
+        train_data,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        generator=torch.Generator().manual_seed(SEED),
+        num_workers=0,
+    ),
     "validation": DataLoader(validation_data, batch_size=BATCH_SIZE, shuffle=False, num_workers=0),
     "test": DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=False, num_workers=0),
 }
@@ -167,8 +170,7 @@ for epoch in range(1, MAX_EPOCHS + 1):
             "class_to_idx": train_data.class_to_idx,
             "architecture": "mobilenet_v3_large",
             "image_size": 224,
-            "balanced_sampling": True,
-            "fracture_sampling_target": FRACTURE_SAMPLING_TARGET,
+            "physically_balanced_training_data": True,
             "best_epoch": best_epoch,
         }, OUTPUT / "best_model.pt")
     else:
@@ -192,7 +194,7 @@ with (OUTPUT / "test_metrics.json").open("w", encoding="utf-8") as stream:
         "maximum_epochs": MAX_EPOCHS,
         "completed_epochs": len(history),
         "best_epoch": best_epoch,
-        "fracture_sampling_target": FRACTURE_SAMPLING_TARGET,
+        "physically_balanced_training_data": True,
         "initial_checkpoint_used": initial_checkpoint_used,
         "test": test,
     }, stream, indent=2)

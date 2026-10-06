@@ -2,25 +2,25 @@
   "model": "MobileNetV3-Large",
   "seed": 42,
   "maximum_epochs": 15,
-  "completed_epochs": 9,
-  "best_epoch": 4,
-  "fracture_sampling_target": 0.5,
+  "completed_epochs": 8,
+  "best_epoch": 3,
+  "physically_balanced_training_data": true,
   "initial_checkpoint_used": true,
   "test": {
-    "loss": 0.4856646516191678,
-    "accuracy": 0.8700787401574803,
-    "fracture_precision": 0.8548387096774194,
-    "fracture_recall": 0.6883116883116883,
-    "specificity": 0.9491525423728814,
-    "fracture_f1": 0.762589928057554,
+    "loss": 0.5100605326183771,
+    "accuracy": 0.8531073446327684,
+    "fracture_precision": 0.861271676300578,
+    "fracture_recall": 0.8418079096045198,
+    "specificity": 0.864406779661017,
+    "fracture_f1": 0.8514285714285714,
     "matrix": [
       [
-        53,
-        24
+        149,
+        28
       ],
       [
-        9,
-        168
+        24,
+        153
       ]
     ]
   }
