@@ -7,7 +7,7 @@ import numpy as np
 
 
 PROJECT = Path(__file__).resolve().parent
-MODEL_DIR = PROJECT / "model_output"
+MODEL_DIR = PROJECT / "graph_data"
 OUTPUT = PROJECT / "graph_outputs"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -77,7 +77,7 @@ finish("error_loss_graph.png")
 matrix = np.array(metrics["test"]["matrix"])
 fig, axis = plt.subplots(figsize=(7, 6))
 image = axis.imshow(matrix, cmap="Blues")
-axis.set_title("MobileNetV3-Large Confusion Matrix")
+axis.set_title("Latest Balanced Model Confusion Matrix")
 axis.set_xlabel("Predicted class")
 axis.set_ylabel("Actual class")
 axis.set_xticks([0, 1], ["Fractured", "Non-fractured"])
@@ -89,6 +89,28 @@ for row in range(2):
                   fontsize=18, fontweight="bold", color=color)
 fig.colorbar(image, ax=axis)
 finish("confusion_matrix.png")
+
+
+# 4. Dataset distribution
+dataset = metrics["dataset"]
+splits = ["Training", "Validation", "Test"]
+fractured_counts = [dataset[name.lower()]["fractured"] for name in splits]
+normal_counts = [dataset[name.lower()]["non_fractured"] for name in splits]
+positions = np.arange(len(splits))
+width = 0.36
+plt.figure(figsize=(9, 5.5))
+plt.bar(positions - width / 2, fractured_counts, width, label="Fractured")
+plt.bar(positions + width / 2, normal_counts, width, label="Non-fractured")
+plt.xlabel("Dataset split")
+plt.ylabel("Number of X-rays")
+plt.title("Latest Balanced Dataset Distribution")
+plt.xticks(positions, splits)
+plt.legend()
+for position, value in zip(positions - width / 2, fractured_counts):
+    plt.text(position, value + 10, str(value), ha="center")
+for position, value in zip(positions + width / 2, normal_counts):
+    plt.text(position, value + 10, str(value), ha="center")
+finish("dataset_distribution.png")
 
 
 print(f"Graphs saved in: {OUTPUT}")
