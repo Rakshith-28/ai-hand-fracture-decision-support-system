@@ -43,8 +43,15 @@ fracture classification and hand-versus-wrist anatomy.
 - Anatomy accuracy: **86.67%**
 
 This experiment improved fracture recall over the accuracy-focused model but did
-not replace it because its overall test accuracy was lower. Its checkpoint and
-metrics are stored in `model_output_single_source/`.
+not replace it because its overall test accuracy was lower. Its checkpoint was
+retired; the experiment remains documented through its code, manifest, and graphs.
+
+## Balanced old-source dataset
+
+`prepare_balanced_old_dataset.py` creates a local, old-source-only dataset with
+356 fractured and 356 non-fractured training images, plus 77 images per class in
+both validation and test. The X-rays remain local and are excluded from Git; the
+selection is reproducible from `dataset_metadata/balanced_old_manifest.csv`.
 
 ## Run the project
 
