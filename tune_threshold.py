@@ -9,9 +9,9 @@ from torchvision import datasets, models, transforms
 
 
 PROJECT = Path(__file__).resolve().parent
-DATA = PROJECT / "hand_dataset_prepared"
-MODEL_PATH = PROJECT / "model_output_advanced" / "best_advanced_model.pt"
-OUTPUT_PATH = PROJECT / "model_output_advanced" / "decision_threshold.json"
+DATA = PROJECT / "hand_dataset"
+MODEL_PATH = PROJECT / "model_output" / "best_model.pt"
+OUTPUT_PATH = PROJECT / "model_output" / "decision_threshold.json"
 BATCH_SIZE = 24
 MINIMUM_VALIDATION_RECALL = 0.72
 

@@ -1,4 +1,3 @@
-import argparse
 import csv
 import json
 from pathlib import Path
@@ -8,16 +7,8 @@ import numpy as np
 
 
 PROJECT = Path(__file__).resolve().parent
-parser = argparse.ArgumentParser(description="Generate model result graphs")
-parser.add_argument(
-    "model",
-    nargs="?",
-    choices=("advanced", "single_source"),
-    default="advanced",
-)
-args = parser.parse_args()
-MODEL_DIR = PROJECT / ("model_output_single_source" if args.model == "single_source" else "model_output_advanced")
-OUTPUT = PROJECT / ("graph_outputs_single_source" if args.model == "single_source" else "graph_outputs_advanced")
+MODEL_DIR = PROJECT / "model_output"
+OUTPUT = PROJECT / "graph_outputs"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 
@@ -86,8 +77,7 @@ finish("error_loss_graph.png")
 matrix = np.array(metrics["test"]["matrix"])
 fig, axis = plt.subplots(figsize=(7, 6))
 image = axis.imshow(matrix, cmap="Blues")
-model_title = "Single-Source Anatomy-Aware Model" if args.model == "single_source" else "Advanced MobileNetV3 Model"
-axis.set_title(f"{model_title} Confusion Matrix")
+axis.set_title("MobileNetV3-Large Confusion Matrix")
 axis.set_xlabel("Predicted class")
 axis.set_ylabel("Actual class")
 axis.set_xticks([0, 1], ["Fractured", "Non-fractured"])

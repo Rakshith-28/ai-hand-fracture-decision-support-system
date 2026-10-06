@@ -1,110 +1,62 @@
 # AI-Based Decision Support System for Hand Fractures
 
-This repository contains the cleaned hand/wrist X-ray dataset, final MobileNetV3-Large training pipeline, trained checkpoint, evaluation metrics, and graphs.
+This project classifies hand and wrist X-rays as `fractured` or `non_fractured` using a transfer-learned MobileNetV3-Large model.
 
 ## Final dataset
 
-- Total: 3,046 X-rays
-- Fractured: 1,195
-- Non-fractured: 1,851
-- Training: 2,538 images
-- Validation: 254 images
-- Test: 254 images
+- Total: 1,690 X-rays
+- Training: 356 fractured and 826 non-fractured
+- Validation: 77 fractured and 177 non-fractured
+- Test: 77 fractured and 177 non-fractured
 
-The prepared images are stored under `hand_dataset_prepared/`.
+The images are stored in `hand_dataset/`. During training, weighted sampling presents both classes equally often without duplicating the saved image files. Validation and test data remain unchanged so evaluation reflects the real held-out distribution.
 
-## Final model
+## Final result
 
-- Architecture: MobileNetV3-Large
-- Transfer learning with conservative fine-tuning of the final feature blocks
-- Class-balanced, source-aware sampling and training-time augmentation
-- Best test accuracy: **87.80%**
+- Test accuracy: **87.80%**
 - Fracture precision: **87.10%**
 - Fracture recall: **70.13%**
 - Specificity: **95.48%**
-- F1-score: **77.70%**
+- Fracture F1-score: **77.70%**
+- Confusion matrix: `[[54, 23], [8, 169]]`
 
-The best checkpoint and its recorded results are in `model_output_advanced/`.
-
-## Single-source anatomy-aware experiment
-
-To remove cross-dataset style differences, a second MobileNetV3-Large model was
-trained only on BoneFract hand and wrist X-rays. Its shared backbone learns both
-fracture classification and hand-versus-wrist anatomy.
-
-- Unique images after duplicate removal: **5,378**
-- Training images: **4,314**
-- Validation images: **539**
-- Test images: **525**
-- Best epoch: **4**
-- Test accuracy: **77.90%**
-- Fracture recall: **73.76%**
-- Fracture F1-score: **76.98%**
-- Anatomy accuracy: **86.67%**
-
-This experiment improved fracture recall over the accuracy-focused model but did
-not replace it because its overall test accuracy was lower. Its checkpoint was
-retired; the experiment remains documented through its code, manifest, and graphs.
-
-## Balanced old-source dataset
-
-`prepare_balanced_old_dataset.py` creates a local, old-source-only dataset with
-356 fractured and 356 non-fractured training images, plus 77 images per class in
-both validation and test. The X-rays remain local and are excluded from Git; the
-selection is reproducible from `dataset_metadata/balanced_old_manifest.csv`.
+The selected checkpoint and recorded results are in `model_output/`. Graphs are in `graph_outputs/`.
 
 ## Run the project
 
 1. Install Python 3.11 or newer.
-2. Double-click `setup.bat` once.
-3. Double-click `train_advanced.bat` to retrain the model.
-4. Double-click `generate_graphs.bat` to regenerate the result graphs.
-
-To build the single-source dataset and retrain its anatomy-aware model, run
-`train_single_source.bat`. Generate its separate graphs with:
+2. Run `setup.bat` once.
+3. Run `train.bat` to train and evaluate the model.
+4. Run `generate_graphs.bat` to regenerate the graphs from the latest saved results.
 
 ```powershell
-.\generate_graphs.bat single_source
+.\setup.bat
+.\train.bat
+.\generate_graphs.bat
 ```
 
 ## Predict one X-ray
-
-Run the command-line predictor:
 
 ```powershell
 .\.venv\Scripts\python.exe .\predict.py "C:\path\to\xray.png"
 ```
 
-For the validation-selected screening mode, which detects more fractures at the
-cost of more false alarms and lower overall accuracy:
-
-```powershell
-.\.venv\Scripts\python.exe .\predict.py "C:\path\to\xray.png" --screening
-```
+Add `--screening` to use the validation-selected higher-recall threshold. It can detect more fractures but may produce more false alarms.
 
 ## Test unseen X-rays
 
-Place new X-rays that were not used for training, validation, or testing inside
-`unseen_xrays`, then double-click `test_unseen.bat`. Predictions are saved in
-`unseen_predictions.csv`. Verify them against reliable labels from the dataset
-or a qualified reviewer.
-
-To batch-test with the higher-recall screening threshold, run:
-
-```powershell
-.\test_unseen.bat --screening
-```
-
-Training is CPU-compatible but will run faster with suitable accelerated PyTorch hardware.
+Put genuinely unseen images inside `unseen_xrays/`, then run `test_unseen.bat`. Predictions are saved in `unseen_predictions.csv`.
 
 ## Main files
 
-- `train_advanced.py` — final training and evaluation pipeline
-- `predict.py` — reusable single-image prediction code
-- `test_unseen.py` — batch testing for genuinely unseen X-rays
-- `model_output_advanced/` — best model, history, and test metrics
-- `graph_outputs/` — accuracy, loss, and confusion-matrix graphs
+- `train.py` — training, validation, model selection, and final testing
+- `predict.py` — single-image prediction
+- `test_unseen.py` — batch prediction on unseen X-rays
+- `tune_threshold.py` — validation-based threshold selection
+- `generate_graphs.py` — result graphs
+- `hand_dataset/` — final dataset
+- `model_output/` — checkpoint, history, threshold, and test metrics
 
-## Important limitation
+## Limitation
 
-This is an academic decision-support prototype, not a clinically validated diagnostic system or replacement for a radiologist.
+This is an academic decision-support prototype. It is not clinically validated and must not replace assessment by a qualified medical professional.

@@ -9,8 +9,8 @@ from torchvision import models, transforms
 
 
 PROJECT = Path(__file__).resolve().parent
-DEFAULT_MODEL = PROJECT / "model_output_advanced" / "best_advanced_model.pt"
-THRESHOLD_REPORT = PROJECT / "model_output_advanced" / "decision_threshold.json"
+DEFAULT_MODEL = PROJECT / "model_output" / "best_model.pt"
+THRESHOLD_REPORT = PROJECT / "model_output" / "decision_threshold.json"
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"}
 
 

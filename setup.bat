@@ -22,7 +22,7 @@ echo Installing required packages...
 if errorlevel 1 goto error
 
 echo.
-echo Setup complete. You can now run train_advanced.bat.
+echo Setup complete. You can now run train.bat.
 pause
 exit /b 0
 

@@ -1,24 +1,16 @@
-# Dataset sources
+# Dataset source
 
-## BoneFract additions
+The final dataset was prepared from **FracAtlas**, using only hand and wrist X-rays relevant to binary fracture classification.
 
-- Dataset: **BoneFract: A Bone Fracture Dataset**
-- Official record: https://doi.org/10.17632/4cr7f2359x.1
-- License: CC BY 4.0
-- Positive use: 350 Hand-positive and 350 Wrist-positive candidates selected with seed 42; 685 unique images remained after duplicate removal
-- Negative use: matched Hand-negative and Wrist-negative candidates selected with seed 43; 671 unique images remained after duplicate removal
-- Patient handling: the source provides one original X-ray per unique patient
-- Processing: grayscale conversion, automatic contrast, center crop, and resize to 224×224
-- Labels: anatomy and fracture status supplied by the dataset authors
-- Limitation: the public metadata does not include patient ages, so this subset cannot be certified as adult-only
+Images that were elbow-only, forearm/upper-arm, unrelated to the hand or wrist, unclear, or corrupted were excluded during manual review.
 
-The supplied validation and test sets were not modified, so the existing held-out evaluation remains comparable. Positive and negative manifests are stored in `dataset_metadata/bonefract_added_manifest.csv` and `dataset_metadata/bonefract_negative_manifest.csv`.
+## Final split
 
-## BoneFract single-source experiment
+| Split | Fractured | Non-fractured | Total |
+|---|---:|---:|---:|
+| Training | 356 | 826 | 1,182 |
+| Validation | 77 | 177 | 254 |
+| Test | 77 | 177 | 254 |
+| **Total** | **510** | **1,180** | **1,690** |
 
-The separate `bonefract_single_source/` dataset preserves BoneFract's supplied
-train, validation, and test divisions. Within every division and anatomy, an
-equal number of positive and negative candidates was selected. Content-level
-duplicates were removed, leaving 5,378 unique images. The complete provenance,
-patient identifiers, source paths, and SHA-256 hashes are recorded in
-`dataset_metadata/bonefract_single_source_manifest.csv`.
+Training imbalance is handled with weighted sampling. Validation and test images are never augmented or used to update model weights.
