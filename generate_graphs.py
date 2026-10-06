@@ -7,7 +7,7 @@ import numpy as np
 
 
 PROJECT = Path(__file__).resolve().parent
-MODEL_DIR = PROJECT / "graph_data"
+MODEL_DIR = PROJECT / "model_output"
 OUTPUT = PROJECT / "graph_outputs"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
@@ -92,10 +92,16 @@ finish("confusion_matrix.png")
 
 
 # 4. Dataset distribution
-dataset = metrics["dataset"]
 splits = ["Training", "Validation", "Test"]
-fractured_counts = [dataset[name.lower()]["fractured"] for name in splits]
-normal_counts = [dataset[name.lower()]["non_fractured"] for name in splits]
+split_folders = ["train", "validation", "test"]
+fractured_counts = [
+    len(list((PROJECT / "hand_dataset" / split / "fractured").glob("*")))
+    for split in split_folders
+]
+normal_counts = [
+    len(list((PROJECT / "hand_dataset" / split / "non_fractured").glob("*")))
+    for split in split_folders
+]
 positions = np.arange(len(splits))
 width = 0.36
 plt.figure(figsize=(9, 5.5))
@@ -103,7 +109,7 @@ plt.bar(positions - width / 2, fractured_counts, width, label="Fractured")
 plt.bar(positions + width / 2, normal_counts, width, label="Non-fractured")
 plt.xlabel("Dataset split")
 plt.ylabel("Number of X-rays")
-plt.title("Latest Balanced Dataset Distribution")
+plt.title("Current Dataset Distribution")
 plt.xticks(positions, splits)
 plt.legend()
 for position, value in zip(positions - width / 2, fractured_counts):
