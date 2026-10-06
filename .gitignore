@@ -22,3 +22,4 @@ single_source_pipeline.log
 single_source_pipeline_status.txt
 /bonefract_single_source/
 /hand_dataset_balanced_old/
+/hand_dataset_balanced_expanded_old/
